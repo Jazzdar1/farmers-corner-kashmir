@@ -1,0 +1,9 @@
+{
+  "name": "Farmer's Corner Kashmir",
+  "description": "A comprehensive agricultural assistant for Kashmiri farmers, offering disease detection, real-time market prices, and expert AI advice specifically tailored for regional crops like saffron and apples.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
