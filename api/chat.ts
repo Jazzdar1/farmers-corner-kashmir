@@ -6,20 +6,31 @@ export default async function handler(
   res: VercelResponse
 ) {
   try {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        text: "AI service not configured (missing GEMINI_API_KEY)"
+      });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const { prompt } = req.body || {};
+
+    if (!prompt) {
+      return res.status(400).json({ text: "Missing prompt" });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
-    res.status(200).json({ text });
+    return res.status(200).json({ text });
   } catch (error) {
-    res.status(500).json({ error: "Gemini API failed" });
+    console.error("Gemini error:", error);
+
+    // ✅ NEVER crash
+    return res.status(200).json({
+      text: "AI service temporarily unavailable"
+    });
   }
 }
