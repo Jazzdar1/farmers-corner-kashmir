@@ -20,8 +20,3 @@
   "include": ["./**/*.ts", "./**/*.tsx"],
   "exclude": ["node_modules"]
 }
-{
-  "compilerOptions": {
-    "skipLibCheck": true
-  }
-}

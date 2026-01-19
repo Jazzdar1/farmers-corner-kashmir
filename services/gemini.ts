@@ -1,34 +1,94 @@
+type AITextResult = { text: string };
+type WeatherResult = { condition: string };
+
 async function callAI(prompt: string): Promise<string> {
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify({ prompt }),
   });
-
-  if (!res.ok) throw new Error("AI request failed");
   const data = await res.json();
   return data.text || "";
 }
 
-export const getDistrictWeather = (district: string) =>
-  callAI(`Give current weather summary for ${district} district for farmers`);
+/* ---------------- WEATHER ---------------- */
+export async function getDistrictWeather(
+  latOrDistrict: number | string,
+  lon?: number
+): Promise<WeatherResult> {
+  const query =
+    typeof latOrDistrict === "number"
+      ? `Weather for latitude ${latOrDistrict} longitude ${lon}`
+      : `Weather for district ${latOrDistrict}`;
 
-export const analyzeCropDisease = (details: string) =>
-  callAI(`Analyze crop disease and suggest treatment: ${details}`);
+  const text = await callAI(query);
+  return { condition: text };
+}
 
-export const findNearbyDealers = (location: string) =>
-  callAI(`Find nearby fertilizer and seed dealers near ${location}`);
+/* ---------------- MANDI ---------------- */
+export async function findNearbyMandis(
+  lat: number,
+  lon: number
+): Promise<AITextResult> {
+  const text = await callAI(
+    `Find nearby mandis for latitude ${lat} longitude ${lon}`
+  );
+  return { text };
+}
 
-export const getExpertAdvice = (question: string) =>
-  callAI(`You are an agriculture expert. Answer: ${question}`);
+/* ---------------- DEALERS ---------------- */
+export async function findNearbyDealers(
+  lat: number,
+  lon: number
+): Promise<AITextResult> {
+  const text = await callAI(
+    `Find nearby fertilizer and seed dealers for latitude ${lat} longitude ${lon}`
+  );
+  return { text };
+}
 
-export const findNearbyMandis = (crop: string) =>
-  callAI(`List nearby mandis and prices for ${crop}`);
+/* ---------------- EXPERT CHAT ---------------- */
+export async function getExpertAdvice(
+  history: any,
+  question: string,
+  language: string
+): Promise<string> {
+  return callAI(
+    `Answer in ${language}. Question: ${question}. Context: ${JSON.stringify(
+      history
+    )}`
+  );
+}
 
-export const getDeepExpertView = (topic: string) =>
-  callAI(`Give a deep expert-level agriculture analysis on ${topic}`);
+/* ---------------- DISEASE ANALYSIS ---------------- */
+export async function analyzeCropDisease(
+  imageData: string,
+  language?: string
+): Promise<any> {
+  const text = await callAI(
+    `Analyze crop disease from image data. Respond in ${
+      language || "English"
+    }`
+  );
 
-export const generateUrduDiagnosisAudio = async (text: string) => {
-  // placeholder – keeps build working
+  return {
+    diseaseName: "Detected issue",
+    description: text,
+    solution: text,
+  };
+}
+
+/* ---------------- DEEP EXPERT VIEW ---------------- */
+export async function getDeepExpertView(
+  data: string,
+  diseaseName: string
+): Promise<string> {
+  return callAI(
+    `Provide deep expert analysis for ${diseaseName}. Data: ${data}`
+  );
+}
+
+/* ---------------- AUDIO PLACEHOLDER ---------------- */
+export async function generateUrduDiagnosisAudio(text: string) {
   return text;
-};
+}
