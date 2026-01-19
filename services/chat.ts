@@ -6,15 +6,20 @@ export default async function handler(
   res: VercelResponse
 ) {
   try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const prompt = req.body.prompt;
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
     res.status(200).json({ text });
-  } catch (err) {
-    res.status(500).json({ error: "AI chat failed" });
+  } catch (error) {
+    res.status(500).json({ error: "Gemini API failed" });
   }
 }
