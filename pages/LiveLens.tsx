@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { Camera, Zap, Mic, MicOff, RefreshCw, AlertCircle, X, ShieldAlert, ScanEye, Languages, CheckCircle2, Info, PlugZap, Upload, Image as ImageIcon } from 'lucide-react';
-import { analyzeCropDisease } from '../services/gemini';
+import { analyzeCropDisease } from '@/services/gemini'
 import { DiseaseAnalysis } from '../types';
 
 // Audio Helpers

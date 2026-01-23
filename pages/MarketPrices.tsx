@@ -17,7 +17,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { findNearbyMandis } from '../services/gemini';
+import { findNearbyMandis } from '@/services/gemini';
 
 const priceHistory = [
   { name: 'Jan', price: 900 },

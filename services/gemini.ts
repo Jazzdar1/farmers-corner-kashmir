@@ -1,127 +1,110 @@
-// services/gemini.ts
+// src/services/gemini.ts
+// ===================================================
+// AI SERVICE (SAFE MOCK – FRONTEND ONLY)
+// ===================================================
 
-/* ================= INTERNAL AI CALL ================= */
-
-async function callAI(prompt: string): Promise<string> {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
-  });
-
-  if (!res.ok) {
-    throw new Error("AI request failed");
-  }
-
-  const data = await res.json();
-  return data.text || "";
-}
-
-/* ================= WEATHER ================= */
-
-export async function getDistrictWeather(
-  latOrDistrict: number | string,
-  lon?: number
-): Promise<{ condition: string }> {
-  const query =
-    typeof latOrDistrict === "number"
-      ? `Weather summary for latitude ${latOrDistrict} longitude ${lon}`
-      : `Weather summary for district ${latOrDistrict}`;
-
-  const text = await callAI(query);
-  return { condition: text };
-}
-
-/* ================= MANDI ================= */
-
-export async function findNearbyMandis(
-  lat: number,
-  lon: number
-): Promise<{ text: string }> {
-  const text = await callAI(
-    `Find nearby mandis and prices near latitude ${lat} longitude ${lon}`
-  );
-  return { text };
-}
-
-/* ================= DEALERS ================= */
-
-export async function findNearbyDealers(
-  lat: number,
-  lon: number
-): Promise<{ text: string }> {
-  const text = await callAI(
-    `Find nearby fertilizer and seed dealers near latitude ${lat} longitude ${lon}`
-  );
-  return { text };
-}
-
-/* ================= EXPERT CHAT ================= */
-
-export async function getExpertAdvice(
-  history: any,
-  question: string,
-  language: string
-): Promise<string> {
-  return callAI(
-    `You are an agriculture expert. Answer in ${language}.
-     Question: ${question}
-     Context: ${JSON.stringify(history)}`
-  );
-}
-
-/* ================= DISEASE ANALYSIS ================= */
-
-export async function analyzeCropDisease(
-  image: string,
-  language?: string
-): Promise<{
-  diseaseName: string;
-  description: string;
-  severity: "Low" | "Medium" | "High";
+export type DiseaseAnalysis = {
+  disease: string;
   confidence: number;
-  treatment: string[];
-  preventiveMeasures: string[];
-}> {
-  // Placeholder AI call
-  await callAI(
-    `Analyze crop disease from image. Respond in ${language || "English"}`
-  );
+  advice: string;
+  symptoms: string[];
+  recommendations: string[];
+  audioBase64?: string | null;
+};
+
+// ---------------------------------------------------
+// Core mock AI call
+// ---------------------------------------------------
+async function delay(ms = 600) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+export async function callAI(prompt: string) {
+  console.log("🤖 AI Prompt:", prompt);
+  await delay();
 
   return {
-    diseaseName: "Detected Crop Issue",
-    description:
-      "The crop shows visible symptoms of stress or infection based on leaf color and texture.",
-    severity: "Medium", // ✅ FIXED ENUM
-    confidence: 0.85,
-    treatment: [
-      "Apply recommended fungicide",
-      "Avoid over-irrigation",
-      "Remove affected leaves"
-    ],
-    preventiveMeasures: [
-      "Use certified seeds",
-      "Maintain proper spacing",
-      "Regular field inspection"
-    ]
+    text: "AI running in demo mode"
   };
 }
 
-/* ================= DEEP EXPERT VIEW ================= */
+// ---------------------------------------------------
+// Weather
+// ---------------------------------------------------
+export async function getDistrictWeather(district: string) {
+  await delay();
 
-export async function getDeepExpertView(
-  data: string,
-  diseaseName: string
-): Promise<string> {
-  return callAI(
-    `Provide deep expert agricultural analysis for ${diseaseName}. Data: ${data}`
-  );
+  return {
+    temperature: "22°C",
+    condition: "Clear Sky",
+    precipitation: "20%",
+    humidity: "55%",
+    windSpeed: "10 km/h",
+    forecast: "Weather is suitable for farming activities.",
+    farmerTip: "Avoid over-irrigation.",
+    urduSummary: "آج موسم زراعت کے لیے سازگار ہے"
+  };
 }
 
-/* ================= AUDIO PLACEHOLDER ================= */
+// ---------------------------------------------------
+// Expert Chat
+// ---------------------------------------------------
+export async function getExpertAdvice(question: string) {
+  await delay();
 
-export async function generateUrduDiagnosisAudio(
-  analysis: any
-): Promise<string> {
-  return JSON.stringify(analysis);
+  return {
+    answer:
+      "Monitor crops regularly, maintain soil moisture, and follow local advisories."
+  };
+}
+
+// ---------------------------------------------------
+// Crop Disease Analysis (VERY IMPORTANT FIX)
+// ---------------------------------------------------
+export async function analyzeCropDisease(): Promise<DiseaseAnalysis> {
+  await delay();
+
+  return {
+    disease: "Leaf Blight",
+    confidence: 0.84,
+    advice: "Apply recommended fungicide and avoid excess moisture.",
+    symptoms: [
+      "Brown leaf spots",
+      "Yellowing of leaves",
+      "Reduced plant vigor"
+    ],
+    recommendations: [
+      "Remove infected leaves",
+      "Use certified fungicide",
+      "Improve field drainage"
+    ],
+    audioBase64: null // 🔥 important: null, not undefined
+  };
+}
+
+// ---------------------------------------------------
+// Mandis / Dealers
+// ---------------------------------------------------
+export async function findNearbyMandis() {
+  await delay();
+  return [
+    { name: "Srinagar Mandi", distance: "5 km" },
+    { name: "Anantnag Mandi", distance: "32 km" }
+  ];
+}
+
+export async function findNearbyDealers() {
+  await delay();
+  return [
+    {
+      name: "Agro Seeds Store",
+      category: "Seeds & Fertilizer",
+      distance: "3 km"
+    },
+    {
+      name: "Kashmir Krishi Kendra",
+      category: "Pesticides",
+      distance: "6 km"
+    }
+  ];
 }
