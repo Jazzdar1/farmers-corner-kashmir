@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { getExpertAdvice } from "@/services/ai";
 import { Send, Loader2 } from "lucide-react";
+import { getExpertAdvice } from "@/services/ai";
 
 type ChatMsg = {
   role: "user" | "ai";
@@ -13,28 +13,30 @@ const ExpertChat: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
-    const userMsg: ChatMsg = { role: "user", text: input };
-    setMessages(prev => [...prev, userMsg]);
+    const userText = input;
     setInput("");
+
+    setMessages(prev => [...prev, { role: "user", text: userText }]);
     setLoading(true);
 
     try {
-      const res = await getExpertAdvice(input);
+      const res = await getExpertAdvice(userText);
 
-      const aiText =
-        typeof res === "string"
-          ? res
-          : typeof res?.answer === "string"
-          ? res.answer
-          : "Expert response unavailable.";
-
-      setMessages(prev => [...prev, { role: "ai", text: aiText }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "ai",
+          text: typeof res?.answer === "string"
+            ? res.answer
+            : "Expert response unavailable."
+        }
+      ]);
     } catch {
       setMessages(prev => [
         ...prev,
-        { role: "ai", text: "Expert service is temporarily unavailable." }
+        { role: "ai", text: "Expert service is currently unavailable." }
       ]);
     } finally {
       setLoading(false);
@@ -58,6 +60,7 @@ const ExpertChat: React.FC = () => {
             {m.text}
           </div>
         ))}
+
         {loading && (
           <div className="flex items-center gap-2 text-slate-400">
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -76,7 +79,8 @@ const ExpertChat: React.FC = () => {
         />
         <button
           onClick={handleSend}
-          className="bg-emerald-600 text-white px-5 rounded-xl"
+          disabled={loading}
+          className="bg-emerald-600 text-white px-5 rounded-xl disabled:opacity-60"
         >
           <Send />
         </button>

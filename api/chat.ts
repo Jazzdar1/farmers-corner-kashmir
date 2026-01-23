@@ -10,9 +10,8 @@ export default async function handler(
   res: VercelResponse
 ) {
   try {
-    const { type, prompt, image, language } = req.body;
+    const { type, prompt } = req.body;
 
-    // ---------------- Expert Chat ----------------
     if (type === "expert") {
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -20,7 +19,7 @@ export default async function handler(
           {
             role: "system",
             content:
-              "You are an agriculture expert from SKUAST-K advising farmers."
+              "You are an agriculture expert advising Indian farmers."
           },
           { role: "user", content: prompt }
         ]
@@ -31,49 +30,9 @@ export default async function handler(
       });
     }
 
-    // ---------------- Crop Diagnosis (TEXT MODE) ----------------
-    if (type === "crop-diagnosis") {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a plant pathologist. Return JSON only."
-          },
-          {
-            role: "user",
-            content: `
-Analyze crop disease and respond in JSON:
-{
-  "diseaseName": "",
-  "confidence": 0.0,
-  "severity": "Low | Medium | High",
-  "description": "",
-  "treatment": []
-}
-Language: ${language}
-`
-          }
-        ]
-      });
-
-      // Try parsing JSON safely
-      let parsed: any = {};
-      try {
-        parsed = JSON.parse(
-          completion.choices[0].message.content || "{}"
-        );
-      } catch {
-        parsed = {};
-      }
-
-      return res.json(parsed);
-    }
-
-    res.status(400).json({ error: "Invalid request type" });
+    return res.status(400).json({ error: "Invalid request" });
   } catch (err) {
-    console.error("AI ERROR:", err);
-    res.status(500).json({ error: "AI backend failed" });
+    console.error("AI backend error:", err);
+    return res.status(500).json({ error: "AI backend failed" });
   }
 }
