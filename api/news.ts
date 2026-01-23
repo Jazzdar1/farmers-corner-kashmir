@@ -4,32 +4,20 @@ export default function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  try {
-    const category =
-      typeof req.query.category === "string"
-        ? req.query.category
-        : "latest";
+  const category =
+    typeof req.query.category === "string"
+      ? req.query.category
+      : "latest";
 
-    const news = [
+  res.status(200).json({
+    ok: true,
+    category,
+    news: [
       {
-        title: `Latest ${category} news`,
-        description:
-          "News service is running in demo mode. Replace with real API later.",
-        source: "Farmers Corner Kashmir",
-        time: new Date().toISOString()
+        title: `Demo ${category} news`,
+        description: "API is working correctly",
+        source: "Farmers Corner Kashmir"
       }
-    ];
-
-    res.status(200).json({
-      success: true,
-      category,
-      news
-    });
-  } catch (error) {
-    console.error("NEWS API ERROR:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch news"
-    });
-  }
+    ]
+  });
 }
