@@ -1,6 +1,6 @@
-module.exports = function (req, res) {
+export default function handler(req, res) {
   res.status(200).json({
     ok: true,
-    message: "News API working"
+    message: "News API working (ESM)"
   });
-};
+}
